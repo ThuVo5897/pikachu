@@ -1,4 +1,4 @@
-const EMOJIS = ['🍎','🍊','🍇','🍉','🍌','🍓','🍒','🍑','🍍','🥥','🥝','🥑'];
+const EMOJIS = ['🐶','🐱','🐭','🐹','🐰','🦊','🐻','🐼','🐨','🐯','🦁','🐮'];
 
 export const generateBoard = (cols = 12, rows = 8) => {
   const totalTiles = cols * rows;

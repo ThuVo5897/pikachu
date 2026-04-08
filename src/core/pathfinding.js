@@ -88,3 +88,32 @@ export const checkPath = (board, cols, rows, start, end) => {
 
   return null;
 };
+
+// Helper: Find first valid match as hint
+export const findHint = (logicBoard, cols, rows) => {
+  // we gather all tiles by type
+  const tilesByType = {};
+  for (let y = 0; y < rows; y++) {
+    for (let x = 0; x < cols; x++) {
+      const type = logicBoard[y][x];
+      if (type) {
+        if (!tilesByType[type]) tilesByType[type] = [];
+        tilesByType[type].push({ x, y, emoji: type });
+      }
+    }
+  }
+
+  // Iterate over all pairs of same type
+  for (const type in tilesByType) {
+    const list = tilesByType[type];
+    for (let i = 0; i < list.length; i++) {
+      for (let j = i + 1; j < list.length; j++) {
+        const path = checkPath(logicBoard, cols, rows, list[i], list[j]);
+        if (path) {
+          return [list[i], list[j]]; // Return the two hint tiles
+        }
+      }
+    }
+  }
+  return null;
+};

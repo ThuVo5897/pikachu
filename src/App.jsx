@@ -15,9 +15,12 @@ function App() {
     isPlaying,
     isGameOver,
     lines,
+    shuffleCount,
+    hintTiles,
     initGame,
     handleTileClick,
-    shuffle
+    shuffle,
+    useHint
   } = useGameLogic(COLS, ROWS, TIME_LIMIT);
 
   useEffect(() => {
@@ -39,7 +42,10 @@ function App() {
           <span>Time: {formatTime(timeLeft)}</span>
         </div>
         <div className="controls">
-          <button className="shuffle" onClick={shuffle} disabled={!isPlaying}>Shuffle</button>
+          <button className="hint" onClick={useHint} disabled={!isPlaying}>Hint</button>
+          <button className="shuffle" onClick={shuffle} disabled={!isPlaying || shuffleCount <= 0}>
+            Shuffle ({shuffleCount})
+          </button>
           <button onClick={initGame}>Restart</button>
         </div>
       </header>
@@ -54,6 +60,7 @@ function App() {
           lines={lines}
           isGameOver={isGameOver}
           isPlaying={isPlaying}
+          hintTiles={hintTiles}
         />
       )}
     </div>

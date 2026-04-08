@@ -2,7 +2,7 @@ import React from 'react';
 import Tile from './Tile';
 import ConnectionLine from './ConnectionLine';
 
-const Board = ({ board, cols, rows, selected, onTileClick, lines, isGameOver, isPlaying }) => {
+const Board = ({ board, cols, rows, selected, onTileClick, lines, isGameOver, isPlaying, hintTiles }) => {
   const tileSize = 50;
   const gap = 4;
 
@@ -16,14 +16,18 @@ const Board = ({ board, cols, rows, selected, onTileClick, lines, isGameOver, is
         }}
       >
         {board.map((row, y) => 
-          row.map((tile, x) => (
-            <Tile 
-              key={tile.id} 
-              tile={tile} 
-              isSelected={selected?.x === x && selected?.y === y}
-              onClick={() => onTileClick(x, y)}
-            />
-          ))
+          row.map((tile, x) => {
+            const isHinted = hintTiles?.some(h => h.x === x && h.y === y);
+            return (
+              <Tile 
+                key={tile.id} 
+                tile={tile} 
+                isSelected={selected?.x === x && selected?.y === y}
+                isHinted={isHinted}
+                onClick={() => onTileClick(x, y)}
+              />
+            )
+          })
         )}
       </div>
       

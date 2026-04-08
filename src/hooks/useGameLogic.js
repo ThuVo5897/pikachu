@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { generateBoard, getLogicBoard, shuffleBoard } from '../core/boardHelpers';
-import { checkPath } from '../core/pathfinding';
+import { checkPath, findHint } from '../core/pathfinding';
 
 export const useGameLogic = (cols = 12, rows = 8, timeLimit = 300) => {
   const [board, setBoard] = useState([]);
@@ -10,6 +10,8 @@ export const useGameLogic = (cols = 12, rows = 8, timeLimit = 300) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isGameOver, setIsGameOver] = useState(false);
   const [lines, setLines] = useState(null); // stores the path to draw
+  const [shuffleCount, setShuffleCount] = useState(2); // exactly 2 shuffles per game
+  const [hintTiles, setHintTiles] = useState(null); // stores array of 2 tiles to highlight
   
   const initGame = useCallback(() => {
     setBoard(generateBoard(cols, rows));
@@ -19,6 +21,8 @@ export const useGameLogic = (cols = 12, rows = 8, timeLimit = 300) => {
     setIsGameOver(false);
     setSelected(null);
     setLines(null);
+    setShuffleCount(2);
+    setHintTiles(null);
   }, [cols, rows, timeLimit]);
 
   useEffect(() => {
@@ -51,6 +55,9 @@ export const useGameLogic = (cols = 12, rows = 8, timeLimit = 300) => {
     // Different tile clicked
     const targetEmoji = board[y][x].emoji;
     
+    // Clear hints when user makes a click
+    if (hintTiles) setHintTiles(null);
+
     if (selected.emoji !== targetEmoji) {
       // Not matching
       setSelected({ x, y, emoji: targetEmoji });
@@ -85,9 +92,24 @@ export const useGameLogic = (cols = 12, rows = 8, timeLimit = 300) => {
   };
 
   const shuffle = () => {
-    if (!isPlaying) return;
+    if (!isPlaying || shuffleCount <= 0) return;
     setBoard(shuffleBoard(board, cols, rows));
     setSelected(null);
+    setHintTiles(null);
+    setShuffleCount(prev => prev - 1);
+  };
+
+  const useHint = () => {
+    if (!isPlaying || hintTiles) return; // avoid spam
+    const logicBoard = getLogicBoard(board, cols, rows);
+    const hint = findHint(logicBoard, cols, rows);
+    if (hint) {
+      setHintTiles(hint);
+      // Auto clear hint after 2 seconds
+      setTimeout(() => {
+        setHintTiles(null);
+      }, 2000);
+    }
   };
 
   return {
@@ -98,8 +120,11 @@ export const useGameLogic = (cols = 12, rows = 8, timeLimit = 300) => {
     isPlaying,
     isGameOver,
     lines,
+    shuffleCount,
+    hintTiles,
     initGame,
     handleTileClick,
-    shuffle
+    shuffle,
+    useHint
   };
 };
